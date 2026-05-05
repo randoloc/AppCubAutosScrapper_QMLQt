@@ -29,6 +29,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import MAX_RESULTS_PER_RUN, TEMP_DIR
 from revolico_scraper import get_electric_ads
+from atrexport_scraper import get_atrexport_ads
+from chinautoscuba_scraper import get_chinautoscuba_ads
+from cubamotor_scraper import get_cubamotor_ads
 from enricher import enrich_ad
 from email_builder import build_email_html
 from email_sender import send_email_report, save_report_locally
@@ -41,33 +44,77 @@ def run_pipeline(max_ads: int = MAX_RESULTS_PER_RUN, send_email: bool = True) ->
     print(f"📅 {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
     print("=" * 60)
     
-    # Step 1: Scrape Revolico
-    print("\n🔍 PASO 1: Buscando anuncios en Revolico.com...")
-    ads = get_electric_ads(max_ads)
+    all_ads = []
     
-    if not ads:
+    # Source 1: Revolico
+    print("\n🔍 Fuente 1: Revolico.com...")
+    try:
+        revolico_ads = get_electric_ads(max_ads)
+        print(f"  ✅ {len(revolico_ads)} anuncios")
+        all_ads.extend(revolico_ads)
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+    
+    # Source 2: Atrexport
+    print("\n🔍 Fuente 2: Atrexport.com...")
+    try:
+        atrexport_ads = get_atrexport_ads(max_ads // 3)
+        print(f"  ✅ {len(atrexport_ads)} anuncios")
+        all_ads.extend(atrexport_ads)
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+    
+    # Source 3: ChinautosCuba (LXWY)
+    print("\n🔍 Fuente 3: ChinautosCuba.com...")
+    try:
+        chinautos_ads = get_chinautoscuba_ads(max_ads // 3)
+        print(f"  ✅ {len(chinautos_ads)} anuncios")
+        all_ads.extend(chinautos_ads)
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+    
+    # Source 4: CubaMotor
+    print("\n🔍 Fuente 4: CubaMotor.com...")
+    try:
+        cubamotor_ads = get_cubamotor_ads(max_ads // 3)
+        print(f"  ✅ {len(cubamotor_ads)} anuncios")
+        all_ads.extend(cubamotor_ads)
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+    
+    if not all_ads:
         print("⚠️ No se encontraron autos eléctricos en esta ejecución.")
-        # Send a notification email anyway so user knows system is running
         if send_email:
             empty_html = build_empty_report()
             send_email_report([], empty_html, 
                 f"⚡ Alerta EV Cuba - Sin ofertas nuevas {datetime.now().strftime('%d/%m %H:%M')}")
         return False
     
-    print(f"✅ Encontrados {len(ads)} anuncios de autos eléctricos")
+    # Deduplicate by title similarity
+    seen_titles = set()
+    unique_ads = []
+    for ad in all_ads:
+        key = ad.get('title', '').lower().strip()
+        if key not in seen_titles:
+            seen_titles.add(key)
+            unique_ads.append(ad)
+    
+    all_ads = unique_ads[:max_ads]
+    print(f"\n✅ Total: {len(all_ads)} anuncios únicos ({len(all_ads) - len(revolico_ads)} de nuevas fuentes)")
     
     # Step 2: Enrich with technical specs
     print("\n📊 PASO 2: Enriqueciendo con datos técnicos EPA/WLTP...")
     enriched_ads = []
-    for i, ad in enumerate(ads, 1):
-        print(f"  [{i}/{len(ads)}] {ad['title'][:50]}...", end=" ")
+    for i, ad in enumerate(all_ads, 1):
+        print(f"  [{i}/{len(all_ads)}] {ad['title'][:50]}...", end=" ")
         enriched = enrich_ad(ad)
         enriched_ads.append(enriched)
         specs = enriched.get("specs", {})
         if specs and specs.get("model") != "No especificado":
             print(f"✓ {specs.get('model', '')}")
         else:
-            print(f"⚠ Sin specs en DB")
+            src = ad.get('source_label', ad.get('source', ''))
+            print(f"📦 {src}")
     
     # Step 3: Build email
     print("\n📧 PASO 3: Generando reporte HTML...")

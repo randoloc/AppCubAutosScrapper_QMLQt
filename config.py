@@ -12,11 +12,24 @@ load_dotenv()
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USER = os.getenv("EMAIL_USER", "")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")  # App password para Gmail
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
 EMAIL_TO = os.getenv("EMAIL_TO", "randolo92cromix@gmail.com")
+EMAIL_TO_LIST = [e.strip() for e in EMAIL_TO.split(",") if e.strip()] if EMAIL_TO else []
 
 # Search Configuration
 REVOLICO_BASE_URL = "https://www.revolico.com"
+ATREXPORT_URL = "https://atrexport.com/carros-electricos-en-cuba/"
+AUTOCUBANA_URL = "https://autocubana.com/electric_cars?car_type=carros&ev_type=ev"
+CHINAUTOSCUBA_URL = "https://chinautoscuba.com/byd/"
+CUBAMOTOR_URL = "https://www.cubamotor.com/autos/"
+EMAIL_TO_LIST = [e.strip() for e in EMAIL_TO.split(",") if e.strip()] if EMAIL_TO else []
+
+# Search Configuration
+REVOLICO_BASE_URL = "https://www.revolico.com"
+ATREXPORT_BASE_URL = "https://atrexport.com"
+AUTOCUBANA_BASE_URL = "https://autocubana.com"
+CHINAUTOSCUBA_BASE_URL = "https://chinautoscuba.com"
+CUBAMOTOR_BASE_URL = "https://www.cubamotor.com"
 SEARCH_KEYWORDS = [
     "electrico",
     "electrica", 

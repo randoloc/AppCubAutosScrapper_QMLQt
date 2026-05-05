@@ -26,7 +26,7 @@ def send_email_report(ads: List[Dict], html_content: str, subject: str = None) -
         msg = MIMEMultipart('related')
         msg['Subject'] = subject
         msg['From'] = EMAIL_USER
-        msg['To'] = EMAIL_TO
+        msg['To'] = ", ".join(EMAIL_TO_LIST)
         
         # Attach HTML content
         msg.attach(MIMEText(html_content, 'html', 'utf-8'))
@@ -37,7 +37,7 @@ def send_email_report(ads: List[Dict], html_content: str, subject: str = None) -
             server.login(EMAIL_USER, EMAIL_PASSWORD)
             server.send_message(msg)
         
-        print(f"✅ Correo enviado exitosamente a {EMAIL_TO}")
+        print(f"✅ Correo enviado exitosamente a {', '.join(EMAIL_TO_LIST)}")
         print(f"   Asunto: {subject}")
         return True
         
