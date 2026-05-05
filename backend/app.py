@@ -39,6 +39,10 @@ app.add_middleware(
 DB_PATH = os.path.join(os.path.dirname(__file__), "cache.db")
 _cache_lock = threading.Lock()
 
+@app.on_event("startup")
+def startup_event():
+    _init_db()
+
 SCRAPERS = {
     "revolico": lambda n: get_electric_ads(n),
     "atrexport": lambda n: get_atrexport_ads(n),
