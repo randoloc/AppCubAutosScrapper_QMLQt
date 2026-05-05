@@ -17,3 +17,5 @@ build/
 .DS_Store
 /tmp/cuba_ev_alerts/
 sample_report.html
+backend/cache.db
+cuba_ev_qml/
