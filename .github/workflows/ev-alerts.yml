@@ -1,0 +1,45 @@
+name: Cuba EV Alerts
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      max_ads:
+        description: 'Maximum ads to process'
+        required: false
+        default: '20'
+        type: string
+
+concurrency:
+  group: ev-alerts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  scrape-and-alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run EV Alert Pipeline
+        env:
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: python main.py --max-ads ${{ inputs.max_ads || 20 }}
