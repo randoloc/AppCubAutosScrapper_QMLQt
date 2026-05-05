@@ -16,5 +16,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Use uvicorn directly
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Use uvicorn - HF Spaces requires port 7860
+CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "1"]
