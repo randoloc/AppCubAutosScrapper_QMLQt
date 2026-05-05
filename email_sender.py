@@ -9,12 +9,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from typing import List, Dict
-from config import EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD, EMAIL_TO
+from config import EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD, EMAIL_TO, EMAIL_TO_LIST
 
 
 def send_email_report(ads: List[Dict], html_content: str, subject: str = None) -> bool:
     """Envía el reporte por correo electrónico."""
-    if not all([EMAIL_USER, EMAIL_PASSWORD, EMAIL_TO]):
+    if not all([EMAIL_USER, EMAIL_PASSWORD]) or not EMAIL_TO_LIST:
         print("ERROR: Faltan credenciales de correo. Configura EMAIL_USER, EMAIL_PASSWORD y EMAIL_TO en .env")
         return False
     
