@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.git/
+.qmake.stash
+Makefile*
+release/
+qml/
+src/
+*.pro
+*.qrc
+*.pro.user
+cuba_ev_qml/
+*.egg-info/
+*.html
+cache.db
+.gitignore
+README*.md
