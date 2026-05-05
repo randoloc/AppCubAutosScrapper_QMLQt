@@ -1,21 +1,35 @@
-# Sistema de Alertas de Autos Eléctricos Cuba - Archivos ignorados
-.env
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg
+*.py[cod]
 *.egg-info/
 dist/
 build/
-*.log
-*.swp
-*.swo
-*~
-.DS_Store
-/tmp/cuba_ev_alerts/
-sample_report.html
+.eggs/
+
+# Qt / CubAutosFinder
+.qmake.stash
+*.pro.user
+*.qmlproject.user
+Makefile
+Makefile.*
+release/*.o
+release/*.cpp
+release/*.exe
+release/*.dll
+release/platforms/
+release/imageformats/
+release/qml/
+debug/
+
+# Backend
 backend/cache.db
+
+# Reports
+sample_report.html
 cuba_ev_qml/
+
+# Temp
+error_output.txt
+stdout_output.txt
+stderr.txt
+cuba_autos_log.txt
