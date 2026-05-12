@@ -33,3 +33,22 @@ error_output.txt
 stdout_output.txt
 stderr.txt
 cuba_autos_log.txt
+error.log
+
+# SSL tools
+openssl*.exe
+openssl*.tar.gz
+
+# Build artifacts
+release/Qt*
+release/bearer/
+release/iconengines/
+release/qmltooling/
+release/styles/
+release/translations/
+release/*.o
+release/*.cpp
+release/*.exe
+
+# Scripts
+run*.bat

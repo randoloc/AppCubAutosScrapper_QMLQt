@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QSslSocket>
+#include <QDebug>
 
 #include "vehiclemodel.h"
 #include "apiclient.h"
@@ -9,6 +11,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+
+    qDebug() << "SSL Support:" << QSslSocket::supportsSsl();
+    qDebug() << "SSL Build Version:" << QSslSocket::sslLibraryBuildVersionString();
+    qDebug() << "SSL Runtime Version:" << QSslSocket::sslLibraryVersionString();
     app.setOrganizationName("CubaEV");
     app.setApplicationName("CubAutosFinder");
     app.setApplicationVersion("1.0.0");

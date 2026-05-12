@@ -39,7 +39,7 @@ private slots:
     void onReplyFinished(QNetworkReply *reply);
 
 private:
-    QString m_apiUrl = "http://localhost:8000";
+    QString m_apiUrl = "https://randolo-cuba-escrapper-autos.hf.space";
     bool m_loading = false;
     QString m_status;
     QNetworkAccessManager *m_manager;
