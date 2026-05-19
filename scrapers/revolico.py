@@ -325,3 +325,5 @@ if __name__ == "__main__":
         print(f"Tel: {ad.get('contact_phone')} / WA: {ad.get('contact_whatsapp')}")
         print(f"Imágenes: {len(ad.get('images', []))}")
         print(f"Desc: {ad.get('description', '')[:200]}...")
+
+get_ads = get_electric_ads

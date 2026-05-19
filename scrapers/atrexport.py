@@ -137,4 +137,6 @@ if __name__ == '__main__':
     for ad in ads:
         print(f"\n--- {ad['title']} ---")
         print(f"Precio: {ad['price']} {ad['currency']}")
+
+get_ads = get_atrexport_ads
         print(f"URL: {ad['url']}")

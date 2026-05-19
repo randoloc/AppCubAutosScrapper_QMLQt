@@ -109,3 +109,5 @@ if __name__ == '__main__':
         print(f"\n--- {ad['title']} ---")
         print(f"Precio: {ad['price']} {ad['currency']}")
         print(f"URL: {ad['url']}")
+
+get_ads = get_jaccuba_ads

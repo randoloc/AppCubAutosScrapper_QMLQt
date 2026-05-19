@@ -104,3 +104,5 @@ if __name__ == '__main__':
     for ad in ads:
         print(f"\n--- {ad['title']} ---")
         print(f"URL: {ad['url']}")
+
+get_ads = get_chinautoscuba_ads

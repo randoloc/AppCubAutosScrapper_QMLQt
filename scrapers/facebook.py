@@ -102,3 +102,5 @@ def get_facebook_ads(max_results: int = 20) -> List[Dict]:
 if __name__ == '__main__':
     ads = get_facebook_ads(3)
     print(f"{len(ads)} anuncios")
+
+get_ads = get_facebook_ads
