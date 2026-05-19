@@ -117,7 +117,7 @@ python main.py --max-ads 10
 
 | Parámetro | Tipo | Default | Descripción |
 |------------|------|---------|-------------|
-| `sources` | string | todas | Fuentes separadas por coma |
+| `sources` | string | todas | Fuentes: revolico, atrexport, chinautoscuba, cubamotor, dofimall, bdc_one, facebook, finauto, jaccuba |
 | `max_ads` | int | 50 | Máximo de resultados |
 | `min_price` | float | — | Precio mínimo USD |
 | `max_price` | float | — | Precio máximo USD |
@@ -133,6 +133,11 @@ python main.py --max-ads 10
 | [Atrexport](https://atrexport.com) | Catálogo | Autos de importadora |
 | [ChinautosCuba](https://chinautoscuba.com) | Catálogo | BYD y marcas chinas |
 | [CubaMotor](https://cubamotor.com) | Clasificados | Anuncios automotrices |
+| [Dofimall](https://dofimall.com) | E-commerce | Plataforma de compraventa |
+| [BDC One](https://bdcone.com) | Concesionario | Autos de concesionaria |
+| Facebook | Red social | Marketplace y grupos (requiere cookies) |
+| [Finauto](https://finauto.com.cu) | Concesionario | Importadora de autos |
+| [JACCuba](https://jaccuba.com) | Marca | JAC Motors en Cuba |
 
 ## 🧱 Stack tecnológico
 
@@ -140,7 +145,7 @@ python main.py --max-ads 10
 |------|-----------|
 | **Frontend** | Qt 5.14.2 / QML / C++17 |
 | **Backend** | Python 3.10+ / FastAPI |
-| **Scraping** | Requests + BeautifulSoup4 |
+| **Scraping** | Requests + BeautifulSoup4 + Selenium (Facebook) |
 | **Enriquecimiento** | Datos EPA / WLTP |
 | **Email** | SMTP + HTML templates |
 | **Cache** | SQLite |

@@ -28,10 +28,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import MAX_RESULTS_PER_RUN, TEMP_DIR
-from revolico_scraper import get_electric_ads
-from atrexport_scraper import get_atrexport_ads
-from chinautoscuba_scraper import get_chinautoscuba_ads
-from cubamotor_scraper import get_cubamotor_ads
+from scrapers.registry import registry
 from enricher import enrich_ad
 from email_builder import build_email_html
 from email_sender import send_email_report, save_report_locally
@@ -46,41 +43,14 @@ def run_pipeline(max_ads: int = MAX_RESULTS_PER_RUN, send_email: bool = True) ->
     
     all_ads = []
     
-    # Source 1: Revolico
-    print("\n🔍 Fuente 1: Revolico.com...")
-    try:
-        revolico_ads = get_electric_ads(max_ads)
-        print(f"  ✅ {len(revolico_ads)} anuncios")
-        all_ads.extend(revolico_ads)
-    except Exception as e:
-        print(f"  ❌ Error: {e}")
-    
-    # Source 2: Atrexport
-    print("\n🔍 Fuente 2: Atrexport.com...")
-    try:
-        atrexport_ads = get_atrexport_ads(max_ads // 3)
-        print(f"  ✅ {len(atrexport_ads)} anuncios")
-        all_ads.extend(atrexport_ads)
-    except Exception as e:
-        print(f"  ❌ Error: {e}")
-    
-    # Source 3: ChinautosCuba (LXWY)
-    print("\n🔍 Fuente 3: ChinautosCuba.com...")
-    try:
-        chinautos_ads = get_chinautoscuba_ads(max_ads // 3)
-        print(f"  ✅ {len(chinautos_ads)} anuncios")
-        all_ads.extend(chinautos_ads)
-    except Exception as e:
-        print(f"  ❌ Error: {e}")
-    
-    # Source 4: CubaMotor
-    print("\n🔍 Fuente 4: CubaMotor.com...")
-    try:
-        cubamotor_ads = get_cubamotor_ads(max_ads // 3)
-        print(f"  ✅ {len(cubamotor_ads)} anuncios")
-        all_ads.extend(cubamotor_ads)
-    except Exception as e:
-        print(f"  ❌ Error: {e}")
+    for entry in registry:
+        print(f"\n🔍 Fuente: {entry.label}...")
+        try:
+            results = entry.run(max_ads)
+            print(f"  ✅ {len(results)} anuncios")
+            all_ads.extend(results)
+        except Exception as e:
+            print(f"  ❌ Error: {e}")
     
     if not all_ads:
         print("⚠️ No se encontraron autos eléctricos en esta ejecución.")
@@ -100,7 +70,7 @@ def run_pipeline(max_ads: int = MAX_RESULTS_PER_RUN, send_email: bool = True) ->
             unique_ads.append(ad)
     
     all_ads = unique_ads[:max_ads]
-    print(f"\n✅ Total: {len(all_ads)} anuncios únicos ({len(all_ads) - len(revolico_ads)} de nuevas fuentes)")
+    print(f"\n✅ Total: {len(all_ads)} anuncios únicos de {len(registry)} fuentes")
     
     # Step 2: Enrich with technical specs
     print("\n📊 PASO 2: Enriqueciendo con datos técnicos EPA/WLTP...")

@@ -9,22 +9,17 @@ import os
 import json
 import sqlite3
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import threading
 
-# Add parent dir so scrapers can be imported
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.dirname(BACKEND_DIR)
 if PARENT_DIR not in sys.path:
     sys.path.insert(0, PARENT_DIR)
 
-from revolico_scraper import get_electric_ads
-from atrexport_scraper import get_atrexport_ads
-from chinautoscuba_scraper import get_chinautoscuba_ads
-from cubamotor_scraper import get_cubamotor_ads
+from scrapers.registry import registry
 from enricher import enrich_ad
 
 app = FastAPI(title="Cuba EV Scraper API", version="1.0.0")
@@ -39,16 +34,14 @@ app.add_middleware(
 DB_PATH = os.path.join(os.path.dirname(__file__), "cache.db")
 _cache_lock = threading.Lock()
 
+ALL_SOURCE_IDS = ",".join(registry.source_ids)
+
+DEFAULT_SOURCES = "revolico,atrexport,chinautoscuba,cubamotor"
+
+
 @app.on_event("startup")
 def startup_event():
     _init_db()
-
-SCRAPERS = {
-    "revolico": lambda n: get_electric_ads(n),
-    "atrexport": lambda n: get_atrexport_ads(n),
-    "chinautoscuba": lambda n: get_chinautoscuba_ads(n),
-    "cubamotor": lambda n: get_cubamotor_ads(n),
-}
 
 
 def _init_db():
@@ -93,12 +86,12 @@ def _cache_set(key: str, data: list):
         conn.close()
 
 
-def _run_scrapers(sources: list, per_source: int) -> list:
+def _run_scrapers(sources: List[str], per_source: int) -> list:
     all_ads = []
     for src in sources:
-        if src in SCRAPERS:
+        if registry.get(src):
             try:
-                results = SCRAPERS[src](per_source)
+                results = registry.run(src, per_source)
                 all_ads.extend(results)
             except Exception as e:
                 print(f"  [{src}] Error: {e}")
@@ -131,7 +124,6 @@ def _filter_ads(ads: list, min_price: Optional[float], max_price: Optional[float
         filtered = [a for a in filtered if f in a.get("title", "").lower()
                     or f in a.get("description", "").lower()]
 
-    # Enrich results
     enriched = []
     for ad in filtered:
         if not ad.get("specs"):
@@ -148,7 +140,7 @@ def root():
 
 @app.get("/api/search")
 def search(
-    sources: str = Query("revolico,atrexport,chinautoscuba,cubamotor", description="Comma-separated: revolico,atrexport,chinautoscuba,cubamotor"),
+    sources: str = Query(DEFAULT_SOURCES, description=f"Comma-separated: {ALL_SOURCE_IDS}"),
     max_ads: int = Query(50, ge=1, le=200),
     min_price: Optional[float] = Query(None, ge=0),
     max_price: Optional[float] = Query(None, ge=0),
@@ -159,7 +151,7 @@ def search(
 ):
     source_list = [s.strip() for s in sources.split(",") if s.strip()]
     if not source_list:
-        source_list = list(SCRAPERS.keys())
+        source_list = list(registry.source_ids)
 
     cache_key = f"search_{sources}_{max_ads}_{min_price}_{max_price}_{brand}_{province}_{fuel_type}"
 
@@ -171,7 +163,6 @@ def search(
     per_source = max(1, max_ads // len(source_list))
     raw_ads = _run_scrapers(source_list, per_source)
 
-    # Deduplicate by title
     seen = set()
     unique = []
     for ad in raw_ads:
@@ -196,7 +187,7 @@ def search(
 
 @app.get("/api/sources")
 def sources():
-    return {"sources": list(SCRAPERS.keys())}
+    return {"sources": registry.list_sources()}
 
 
 @app.get("/api/brands")
